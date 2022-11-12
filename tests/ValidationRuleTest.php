@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Andileong\Validation\RuleFactory;
+use Andileong\Validation\Rules\Custom;
 use Andileong\Validation\Rules\In;
 use Andileong\Validation\Rules\Required;
 use Andileong\Validation\ValidationException;
@@ -201,17 +202,68 @@ class ValidationRuleTest extends testcase
         $this->assertArrayNotHasKey('age', $validated);
     }
 
+    /** @test */
+    public function it_can_check_against_a_custom_rule_object()
+    {
+        $rule = [
+            'name' => ['required', new Custom('love')]
+        ];
+        $field = 'name';
+        $message = 'The value is not love';
+        $this->validationFailureCheck($rule, $message, ['name' => 'david'], $field);
+        $this->validationSuccessCheck($rule, ['name' => 'love'], $field);
+    }
+
+    /** @test */
+    public function it_support_custom_validation_message_of_a_field()
+    {
+        $rule = [
+            'name' => 'required'
+        ];
+        $field = 'name';
+        $message = 'The name field is missing, please check again';
+        $this->validationFailureCheck($rule, $message, [], $field, ['name.required' => $message]);
+    }
+
+    /** @test */
+    public function it_support_custom_validation_message_of_a_rule()
+    {
+        $rule = [
+            'name' => 'required|in:4,5,6,7'
+        ];
+        $field = 'name';
+        $message = 'The :key must in :argument, you had provided :value, please submit again';
+        $errorMessage = 'The name must in 4,5,6,7, you had provided 1, please submit again';
+        $this->validationFailureCheck($rule, $errorMessage, ['name' => 1], $field, ['in' => $message]);
+
+        $errorMessage = 'The name must in 4,5,6,7, you had provided 2, please submit again';
+        $this->validationFailureCheck($rule, $errorMessage, ['name' => 2], $field, ['in' => $message]);
+    }
+
+    /** @test */
+    public function it_support_closure_validation()
+    {
+        $rule = [
+            'name' => ['required',
+                fn($value, $key, $data) => $value === 'closure'
+            ]
+        ];
+        $field = 'name';
+        $message = 'the name is not closure, this is a custom closure error message';
+        $this->validationFailureCheck($rule, $message, [], $field, ['name.closure' => $message]);
+    }
+
     public function assertErrorExist($exception, $message, $fields)
     {
         $errors = $exception->errors();
         $this->assertTrue(in_array($message, $errors['errors'][$fields]));
     }
 
-    private function validationFailureCheck($rule, string $message, $data, $field)
+    private function validationFailureCheck($rule, string $message, $data, $field, $validationMessage = [])
     {
         $validator = new Validator($data);
         try {
-            $validator->validate($rule);
+            $validator->validate($rule, $validationMessage);
         } catch (ValidationException $exception) {
             $this->assertErrorExist($exception, $message, $field);
         }

@@ -22,8 +22,6 @@ class Validator
      */
     public function validate(array $rules, array $message = [])
     {
-
-
         $this->messages = $message;
         $results = array_map(fn($rule, $key) => $this->createRule(
             $this->parseRuleToArray($rule), $key
