@@ -253,6 +253,26 @@ class ValidationRuleTest extends testcase
         $this->validationFailureCheck($rule, $message, [], $field, ['name.closure' => $message]);
     }
 
+    /** @test */
+    public function all_validation_errors_should_return()
+    {
+        $rule = ['name' => 'required', 'age' => 'required'];
+        $this->validationFailureCheck(
+            $rule,
+            'The name is required',
+            [],
+            'name',
+        );
+
+        $this->validationFailureCheck(
+            $rule,
+            'The age is required',
+            [],
+            'age',
+        );
+
+    }
+
     public function assertErrorExist($exception, $message, $fields)
     {
         $errors = $exception->errors();

@@ -25,9 +25,14 @@ class Validator
         $this->messages = $message;
         $results = array_map(fn($rule, $key) => $this->createRule(
             $this->parseRuleToArray($rule), $key
-        ), $rules, array_keys($rules))[0];
+        ), $rules, array_keys($rules));
 
-        $results = array_reduce($results,function ($carry, Rule $rule) {
+        $arr = [];
+        array_walk_recursive($results, function ($a) use (&$arr) {
+            $arr[] = $a;
+        });
+
+        $results = array_reduce($arr, function ($carry, Rule $rule) {
             $result = $rule->check();
             if (!$result) {
                 $this->hasErrors = true;
