@@ -1,0 +1,17 @@
+{
+    "name": "andileong/validation",
+    "description": "a pure php validation package",
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "symfony/var-dumper": "^6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Andileong\\Validation\\": "src/",
+            "Tests\\": "tests/"
+        }
+    }
+}
