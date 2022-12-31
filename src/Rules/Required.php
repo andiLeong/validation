@@ -6,7 +6,7 @@ class Required extends Rule
 {
     public function check(): bool
     {
-        return !is_null($this->value);
+        return !is_null($this->value) && $this->value != '';
     }
 
     public function message() :string

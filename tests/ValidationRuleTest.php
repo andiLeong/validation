@@ -31,10 +31,18 @@ class ValidationRuleTest extends testcase
     /** @test */
     public function it_can_check_against_required_rule()
     {
+        $rule = ['name' => 'required'];
         $this->validationFailureCheck(
-            $rule = ['name' => 'required'],
+            $rule,
             'The name is required',
             [],
+            'name',
+        );
+
+        $this->validationFailureCheck(
+            $rule,
+            'The name is required',
+            ['name' => ''],
             'name',
         );
 
