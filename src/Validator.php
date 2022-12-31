@@ -9,6 +9,7 @@ class Validator
 {
     private $messages;
     private $hasErrors = false;
+    private $nullable = [];
 
     public function __construct(
         public array $data,
@@ -27,12 +28,9 @@ class Validator
             $this->parseRuleToArray($rule), $key
         ), $rules, array_keys($rules));
 
-        $arr = [];
-        array_walk_recursive($results, function ($a) use (&$arr) {
-            $arr[] = $a;
-        });
+        $flattenRules = $this->flattenRules($results);
 
-        $results = array_reduce($arr, function ($carry, Rule $rule) {
+        $results = array_reduce($flattenRules, function ($carry, Rule $rule) {
             $result = $rule->check();
             if (!$result) {
                 $this->hasErrors = true;
@@ -45,7 +43,7 @@ class Validator
             throw new ValidationException($results);
         }
 
-        return array_intersect_key($this->data, array_flip(array_keys($rules)));
+        return $this->validatedData($rules);
     }
 
     /**
@@ -56,10 +54,16 @@ class Validator
      */
     private function createRule(array $rules, $key): array
     {
-        return array_map(
-            fn($rule) => $this->buildRuleInstance($rule, $key),
-            $rules
-        );
+        $rulesArray = [];
+        foreach ($rules as $value){
+            if($value === 'nullable'){
+                $this->nullable[] = $key;
+                continue;
+            }
+            $this->buildRuleInstance($value, $key);
+        }
+
+        return $rulesArray;
     }
 
     /**
@@ -102,6 +106,30 @@ class Validator
         return $this
             ->getRuleFactory($rule, $key)
             ->$method();
+    }
+
+    /**
+     * flatten the rules collection
+     * @param array $results
+     * @return array
+     */
+    private function flattenRules(array $results)
+    {
+        $flattened = [];
+        array_walk_recursive($results, function ($a) use (&$flattened) {
+            $flattened[] = $a;
+        });
+        return $flattened;
+    }
+
+    /**
+     * return the validated data
+     * @param $rules
+     * @return array
+     */
+    private function validatedData($rules)
+    {
+        return array_intersect_key($this->data, array_flip(array_keys($rules)));
     }
 
 }

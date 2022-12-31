@@ -54,6 +54,20 @@ class ValidationRuleTest extends testcase
     }
 
     /** @test */
+    public function it_can_check_against_nullable_rule()
+    {
+        $this->validationSuccessCheck(
+            $rule = ['foo' => 'nullable'],
+            ['foo' => ''],
+            'foo',
+        );
+
+        $validator = new Validator([]);
+        $data = $validator->validate($rule);
+        $this->assertArrayNotHasKey('foo', $data);
+    }
+
+    /** @test */
     public function it_can_check_against_min_rule()
     {
         $this->validationFailureCheck(
