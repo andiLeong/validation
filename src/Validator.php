@@ -60,7 +60,7 @@ class Validator
                 $this->nullable[] = $key;
                 continue;
             }
-            $this->buildRuleInstance($value, $key);
+            $rulesArray[] = $this->buildRuleInstance($value, $key);
         }
 
         return $rulesArray;
