@@ -7,7 +7,11 @@ class StartsWith extends Rule
 
     public function check(): bool
     {
-        return str_starts_with($this->value,$this->arguments[0]);
+        if (!is_string($this->value)) {
+            return false;
+        }
+
+        return str_starts_with($this->value, $this->arguments[0]);
     }
 
     public function message(): string

@@ -14,7 +14,15 @@ class Min extends Rule
 
     public function check(): bool
     {
-        return strlen($this->value ?? '') >= $this->min;
+        if(is_string($this->value) && strlen(trim($this->value) ?? '') >= $this->min){
+            return true;
+        }
+
+        if(is_array($this->value)){
+            return count($this->value) >= $this->min;
+        }
+
+        return false;
     }
 
     public function message() :string

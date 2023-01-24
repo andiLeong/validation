@@ -2,14 +2,16 @@
 
 namespace Andileong\Validation\Rules;
 
+use Andileong\Validation\Trait\EmptyValueChecker;
+
 class RequiredIf extends Rule
 {
+    use EmptyValueChecker;
 
     public function check(): bool
     {
-        $data = $this->getValue($this->arguments[0]);
-        if(!is_null($data) && is_null($this->value)){
-            return false;
+        if($this->otherFieldIsNotEmpty() && $this->isEmpty($this->value)){
+           return false;
         }
 
         return true;
@@ -18,5 +20,10 @@ class RequiredIf extends Rule
     public function message(): string
     {
         return "The $this->key is required";
+    }
+
+    protected function otherFieldIsNotEmpty()
+    {
+        return $this->isNotEmpty($this->getValue($this->arguments[0]));
     }
 }

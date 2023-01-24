@@ -32,35 +32,26 @@ class ValidationRuleTest extends testcase
     public function it_can_check_against_required_rule()
     {
         $rule = ['name' => 'required'];
-        $this->validationFailureCheck(
-            $rule,
-            'The name is required',
-            [],
-            'name',
-        );
+        $message = 'The name is required';
+        $this->validationFailureCheck($rule, $message, [], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ''], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ' '], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
 
-        $this->validationFailureCheck(
-            $rule,
-            'The name is required',
-            ['name' => ''],
-            'name',
-        );
-
-        $this->validationSuccessCheck(
-            $rule,
-            ['name' => 'abcd'],
-            'name',
-        );
+        $this->validationSuccessCheck($rule, ['name' => 'abcd'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 0], 'name');
+        $this->validationSuccessCheck($rule, ['name' => '0'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => false], 'name');
+        $this->validationSuccessCheck($rule, ['name' => true], 'name');
     }
 
     /** @test */
     public function it_can_check_against_nullable_rule()
     {
-        $this->validationSuccessCheck(
-            $rule = ['foo' => 'nullable'],
-            ['foo' => ''],
-            'foo',
-        );
+        $rule = ['foo' => 'nullable'];
+        $this->validationSuccessCheck($rule, ['foo' => ''], 'foo');
+        $this->validationSuccessCheck($rule, ['foo' => null], 'foo');
 
         $validator = new Validator([]);
         $data = $validator->validate($rule);
@@ -70,157 +61,116 @@ class ValidationRuleTest extends testcase
     /** @test */
     public function it_can_check_against_min_rule()
     {
-        $this->validationFailureCheck(
-            $rule = [
-                'name' => 'required|min:4'
-            ],
-            $message = 'The name must at least be 4 long',
-            ['name' => 'ab'],
-            'name',
-        );
+        $rule = ['name' => 'min:4'];
+        $message = 'The name must at least be 4 long';
+        $this->validationFailureCheck($rule, $message, ['name' => 'ab'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => true], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ' '], 'name');
 
-        $this->validationSuccessCheck(
-            $rule,
-            ['name' => 'abcd'],
-            'name',
-        );
+        $this->validationSuccessCheck($rule, ['name' => 'abcd'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => '0000'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => [3,5,6,7,7]], 'name');
     }
 
     /** @test */
     public function it_can_check_against_max_rule()
     {
-        $this->validationFailureCheck(
-            $rule = [
-                'name' => 'required|max:4'
-            ],
-            $message = 'The name must not exceed 4 long',
-            ['name' => 'abcde'],
-            'name',
-        );
+        $rule = ['name' => 'max:4'];
+        $message = 'The name must not exceed 4 long';
+        $this->validationFailureCheck($rule, $message, ['name' => 'abcde'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => [2, 3, 4, 5, 6]], 'name');
 
-        $this->validationSuccessCheck(
-            $rule,
-            ['name' => 'abc'],
-            'name',
-        );
+        $this->validationSuccessCheck($rule, ['name' => 'abc'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => ' '], 'name');
+        $this->validationSuccessCheck($rule, ['name' => ''], 'name');
+        $this->validationSuccessCheck($rule, ['name' => []], 'name');
 
     }
 
     /** @test */
     public function it_can_check_against_in_rule()
     {
-        $this->validationFailureCheck(
-            $rule = [
-                'name' => 'required|in:1,2,3'
-            ],
-            $message = 'The name is not in 1,2,3',
-            ['name' => 'abcde'],
-            'name',
-        );
+        $rule = ['name' => 'required|in:1,2,3'];
+        $message = 'The name is not in 1,2,3';
 
-        $this->validationSuccessCheck(
-            $rule,
-            ['name' => 3],
-            'name',
-        );
+        $this->validationFailureCheck($rule, $message, ['name' => 'abcde'], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 3], 'name');
+        $this->validationSuccessCheck($rule, ['name' => '1'], 'name');
     }
 
     /** @test */
     public function it_can_check_against_starts_with_rule()
     {
-        $this->validationFailureCheck(
-            $rule = [
-                'name' => 'required|starts_with:z'
-            ],
-            'The name must starts with z',
-            ['name' => 'abcde'],
-            'name',
-        );
+        $rule = ['name' => 'starts_with:z'];
+        $message = 'The name must starts with z';
+        $this->validationFailureCheck($rule, $message, ['name' => 'abcde'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ''], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ' '], 'name');
 
-        $this->validationSuccessCheck(
-            $rule,
-            ['name' => 'zah'],
-            'name',
-        );
-
+        $this->validationSuccessCheck($rule, ['name' => 'zah'], 'name');
     }
 
     /** @test */
     public function it_can_check_against_ends_with_rule()
     {
+        $rule = ['name' => 'required|ends_with:z'];
         $message = 'The name must ends with z';
-        $this->validationFailureCheck(
-            $rule = [
-                'name' => 'required|ends_with:z'
-            ],
-            $message,
-            ['name' => 'abcde'],
-            'name',
-        );
+        $this->validationFailureCheck($rule, $message, ['name' => 'abcde'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ' '], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ''], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
 
-        $this->validationSuccessCheck(
-            $rule,
-            ['name' => 'haz'],
-            'name',
-        );
+        $this->validationSuccessCheck($rule, ['name' => 'haz'], 'name');
     }
 
     /** @test */
     public function it_can_check_against_email_rule()
     {
         $message = 'The email must be a valid email';
-        $this->validationFailureCheck(
-            $rule = [
-                'email' => 'required|email'
-            ],
-            $message,
-            ['email' => 'not a email'],
-            'email',
-        );
+        $rule = ['email' => 'email'];
+        $this->validationFailureCheck($rule, $message, ['email' => 'not a email'], 'email');
+        $this->validationFailureCheck($rule, $message, ['email' => []], 'email');
 
-        $this->validationSuccessCheck(
-            $rule,
-            ['email' => 'email@email.com'],
-            'email',
-        );
+        $this->validationSuccessCheck($rule, ['email' => 'email@email.com'], 'email');
     }
 
     /** @test */
     public function it_can_check_against_between_rule()
     {
         $message = 'The name must between 3,30';
-        $this->validationFailureCheck(
-            $rule = ['name' => 'required|between:3,30'],
-            $message,
-            ['name' => 31],
-            'name',
-        );
+        $rule = ['name' => 'between:3,30'];
+        $this->validationFailureCheck($rule, $message, ['name' => 31], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => '31'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => -2], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ''], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
 
-        $this->validationSuccessCheck(
-            $rule,
-            ['name' => 30],
-            'name',
-        );
+        $this->validationSuccessCheck($rule, ['name' => 30], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 3], 'name');
     }
 
     /** @test */
     public function it_can_check_against_required_if_rule()
     {
-        $validator = new Validator(['age' => 31]);
-        try {
-            $validator->validate([
-                'name' => 'required_if:age'
-            ]);
-        } catch (ValidationException $exception) {
-            $message = 'The name is required';
-            $this->assertErrorExist($exception, $message, 'name');
-        }
+        $message = 'The name is required';
+        $rule = ['name' => 'required_if:age'];
 
-        $validator = new Validator(['age' => 30, 'name' => 'david']);
-        $validated = $validator->validate([
-            'name' => 'required_if:age'
-        ]);
-        $this->assertEquals('david', $validated['name']);
+        $this->validationFailureCheck($rule, $message, ['age' => 31], 'name');
+        $this->validationFailureCheck($rule, $message, ['age' => 31, 'name' => ''], 'name');
+        $this->validationFailureCheck($rule, $message, ['age' => 31, 'name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['age' => 31, 'name' => ' '], 'name');
+        $this->validationFailureCheck($rule, $message, ['age' => 31, 'name' => []], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 'david'], 'name');
+        $validated = $this->validationSuccessCheck($rule, ['age' => 30, 'name' => 'david'], 'name');
         $this->assertArrayNotHasKey('age', $validated);
     }
 

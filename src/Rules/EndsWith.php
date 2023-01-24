@@ -7,6 +7,10 @@ class EndsWith extends Rule
 
     public function check(): bool
     {
+        if(! is_string($this->value)){
+            return false;
+        }
+
         return str_ends_with($this->value ?? '',$this->arguments[0]);
     }
 

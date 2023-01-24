@@ -14,7 +14,15 @@ class Max extends Rule
 
     public function check(): bool
     {
-        return strlen($this->value ?? '') <= $this->max;
+        if(is_string($this->value) && strlen(trim($this->value) ?? '') <= $this->max){
+            return true;
+        }
+
+        if(is_array($this->value)){
+            return count($this->value) <= $this->max;
+        }
+
+        return false;
     }
 
     public function message(): string
