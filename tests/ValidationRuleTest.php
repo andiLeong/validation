@@ -76,6 +76,94 @@ class ValidationRuleTest extends testcase
     }
 
     /** @test */
+    public function it_can_check_against_json_rule()
+    {
+        $rule = ['name' => 'json'];
+        $message = 'The name must be valid JSON';
+        $this->validationFailureCheck($rule, $message, ['name' => 'ab'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => '"f":"x'], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => '{"foo":"bar"}'], 'name');
+    }
+
+    /** @test */
+    public function it_can_check_against_ip_rule()
+    {
+        $rule = ['name' => 'ip'];
+        $message = 'The name must be valid ip address';
+        $this->validationFailureCheck($rule, $message, ['name' => 'ab'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => '127.0.0.1'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => '2001:0db8:85a3:0000:0000:8a2e:0370:7334'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => '192.0.2.146'], 'name');
+    }
+
+    /** @test */
+    public function it_can_check_against_is_string_rule()
+    {
+        $rule = ['name' => 'is_string'];
+        $message = 'The name must be valid string';
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => '127.0.0.1'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 'foo'], 'name');
+    }
+
+    /** @test */
+    public function it_can_check_against_alpha_num_rule()
+    {
+        $rule = ['name' => 'alpha_num'];
+        $message = 'The name must be alpha and number';
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => '127.0.0.1'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ''], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => ' '], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => '-sas'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => '_1'], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 'foo'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 'foo32'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 'FFO'], 'name');
+    }
+
+    /** @test */
+    public function it_can_check_against_is_array_rule()
+    {
+        $rule = ['name' => 'is_array'];
+        $message = 'The name must be valid array';
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 'foo'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 990], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => []], 'name');
+    }
+
+    /** @test */
+    public function it_can_check_against_timezone_rule()
+    {
+        $rule = ['name' => 'timezone'];
+        $message = 'The name must be valid php timezone';
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 'foo'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 990], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 'Asia/Aden'], 'name');
+    }
+
+    /** @test */
     public function it_can_check_against_max_rule()
     {
         $rule = ['name' => 'max:4'];
