@@ -150,6 +150,54 @@ class ValidationRuleTest extends testcase
     }
 
     /** @test */
+    public function it_can_check_against_is_boolean_rule()
+    {
+        $rule = ['name' => 'boolean'];
+        $message = 'The name must be boolean';
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 'foo'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 990], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => true], 'name');
+        $this->validationSuccessCheck($rule, ['name' => false], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 1], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 0], 'name');
+        $this->validationSuccessCheck($rule, ['name' => '0'], 'name');
+        $this->validationSuccessCheck($rule, ['name' => '1'], 'name');
+    }
+
+    /** @test */
+    public function it_can_check_against_decimals_rule()
+    {
+        $rule = ['name' => 'decimal'];
+        $message = 'The name must be valid floating decimal';
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 'foo'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 990], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => -990], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => -990.98], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => '99.9'], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 1.5], 'name');
+
+        $rule = ['name' => 'decimal:3'];
+        $this->validationFailureCheck($rule, $message, ['name' => 1.2], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 1.2222], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 1.567], 'name');
+
+        $rule = ['name' => 'decimal:1,3'];
+        $this->validationFailureCheck($rule, $message, ['name' => 1.2222], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 1.22224], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 1.567], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 1.5], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 1.56], 'name');
+    }
+
+    /** @test */
     public function it_can_check_against_timezone_rule()
     {
         $rule = ['name' => 'timezone'];
@@ -161,6 +209,40 @@ class ValidationRuleTest extends testcase
         $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
 
         $this->validationSuccessCheck($rule, ['name' => 'Asia/Aden'], 'name');
+    }
+
+    /** @test */
+    public function it_can_check_against_number_rule()
+    {
+        $rule = ['name' => 'number'];
+        $message = 'The name must be a number';
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 'foo'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 990.43], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 0.43], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => '998'], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 998], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 0], 'name');
+        $this->validationSuccessCheck($rule, ['name' => -1], 'name');
+    }
+
+    /** @test */
+    public function it_can_check_against_positive_number_rule()
+    {
+        $rule = ['name' => 'number:positive'];
+        $message = 'The name must be a positive number';
+        $this->validationFailureCheck($rule, $message, ['name' => 990.43], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => -43], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => -3], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => -0], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => -1], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 998], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 0], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 1], 'name');
     }
 
     /** @test */
