@@ -1,3 +1,5 @@
+![example workflow](https://github.com/andiLeong/validation/actions/workflows/test.yml/badge.svg)
+
 # Validation
 
 Includes some handful validation rules, it supports custom error message, closure syntax rule , passing object rule , no framework required.
@@ -9,6 +11,16 @@ but only some validation rules are include like
 #### max
 #### between
 #### in
+#### alpha_num
+#### boolean
+#### decimal
+#### ends_with
+#### ip
+#### is_array
+#### is_string
+#### json
+#### number
+#### timezone
 
 
 Interested on how the Laravel validation works that's main reason drive me develop this package. Not intent to use in production but just for quick exercise
