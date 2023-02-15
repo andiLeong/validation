@@ -168,6 +168,25 @@ class ValidationRuleTest extends testcase
     }
 
     /** @test */
+    public function it_can_check_against_is_timestamp_rule()
+    {
+        $rule = ['name' => 'timestamp'];
+        $message = 'The name must be valid timestamp';
+        $this->validationFailureCheck($rule, $message, ['name' => null], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 'foo'], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => true], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => false], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => []], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => -300], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 0], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => 3.98], 'name');
+        $this->validationFailureCheck($rule, $message, ['name' => '300'], 'name');
+
+        $this->validationSuccessCheck($rule, ['name' => 1], 'name');
+        $this->validationSuccessCheck($rule, ['name' => 600], 'name');
+    }
+
+    /** @test */
     public function it_can_check_against_decimals_rule()
     {
         $rule = ['name' => 'decimal'];
